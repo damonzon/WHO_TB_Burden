@@ -14,13 +14,13 @@ The app presentedd here can be run by the following commands in Rstudio.
 
 library(shiny)
 
-library(shinythemes)
+library(shinydashboard)
 
-library(shinyalert)
+library(data.table)
 
-library(lubridate)
+library(ggplot2)
 
-library(shinyjs)
+library(plotly)
 
 shiny::runGitHub("WHO_TB_Burden", "damonzon")
 
