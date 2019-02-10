@@ -24,9 +24,11 @@ library(plotly)
 
 shiny::runGitHub("WHO_TB_Burden", "damonzon")
 
-3. world.csv is the worldwide ISO data from the following URL:
+3. world2.csv is the worldwide ISO data from the following URL:
 
 https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv
+
+
 
 
 
