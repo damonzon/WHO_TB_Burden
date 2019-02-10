@@ -1,0 +1,93 @@
+---
+title: "Tuberculosis Incidence in 2016"
+author: "Patrick Kelly"
+date: "2/8/2019"
+output: html_document
+---
+#Regions
+### Eastern Africa (18 countries)
+### Western Africa (16 countries)
+
+### Data Sources
+
+[Click Here](https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv)"International Country Codes"
+
+[Click Here](https://raw.githubusercontent.com/datamustekeers/WHOtb_data_analysis/master/data/TB_burden_countries_2018-07-04.csv)"WHO: Tuberculsis Incidence Data"
+
+### Data from these two sources were merged to create the "tb_regions.csv" database for this analysis. This required harmonizing country names when they were different in the two data sources. 
+
+```{r}
+suppressMessages(library(data.table))
+suppressMessages(library(dplyr))
+suppressMessages(library(plotly))
+suppressMessages(library(RCurl))
+data <- getURL("https://raw.githubusercontent.com/damonzon/WHO_TB_Burden/master/tb_regions.csv")
+regions <- read.csv(text = data)
+East_Africa <- filter(regions, year == 2016 & region_code == "Eastern Africa" )
+```
+
+### Boxplot: Eastern Africa
+```{r}
+p <- ggplot(East_Africa, aes(x=1,y=incidence,
+      country=Country,Incidence=incidence,
+      pop=population)) + 
+  geom_boxplot() +
+  xlab("Eastern Africa: 18 Countries") +
+  ylab("Tuberculosis Incidence in 2016") +
+  theme_bw() +
+  geom_jitter(shape=16, position=position_jitter(0.1),color="blue")+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+ggplotly(p,tooltip = c("country","Incidence","pop"))
+```
+
+### Barplot: Eastern Africa
+```{r}
+p <- ggplot(East_Africa, aes(x=reorder(Country,incidence), 
+     y=incidence,country=Country,Incidence=incidence,
+     pop=population)) +
+     geom_bar(stat='identity', color="black", fill="blue") +
+    coord_flip() +
+    xlab("Eastern Africa: 18 Countries") +
+    ylab("Tuberculosis Incidence in 2016") +
+    theme_bw()
+ggplotly(p,tooltip = c("country","Incidence","pop"))
+```
+
+##Western Africa
+```{r}
+Western <- filter(regions, year == 2016 & region_code == "Western Africa" )
+```
+
+### Boxplot: Western Africa
+```{r}
+p <- ggplot(Western, aes(x=1,y=incidence,
+      country=Country,Incidence=incidence,
+      pop=population)) + 
+  geom_boxplot() +
+  xlab("Western Africa: 16 Countries") +
+  ylab("Tuberculosis Incidence in 2016") +
+  theme_bw() +
+  geom_jitter(shape=16, position=position_jitter(0.1),color="blue")+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+ggplotly(p,tooltip = c("country","Incidence","pop"))
+```
+
+### Barplot: Western Africa
+
+```{r}
+p <- ggplot(Western, aes(x=reorder(Country,incidence), 
+     y=incidence,country=Country,Incidence=incidence,
+     pop=population)) +
+     geom_bar(stat='identity', color="black", fill="blue") +
+    coord_flip() +
+    xlab("Western Africa: 16 Countries") +
+    ylab("Tuberculosis Incidence in 2016") +
+    theme_bw()
+ggplotly(p,tooltip = c("country","Incidence","pop"))
+```
+
+## Comment
+
+### A Shiny application of this type of analysis would be very useful.
