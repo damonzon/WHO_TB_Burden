@@ -1,0 +1,67 @@
+---
+title: "Data Wrangling"
+author: "Patrick Kelly"
+date: "2/10/2019"
+output: pdf_document
+---
+
+## Data shaping and cleaning was required before the 2 datasets could be merged.
+```{r, message=FALSE}
+library(data.table)
+library(dplyr)
+```
+
+```{r}
+tb_data <- fread("https://raw.githubusercontent.com/datamustekeers/WHOtb_data_analysis/master/data/TB_burden_countries_2018-07-04.csv", select=c(1,6:7,11))
+names(tb_data) <- c("Country", "year","population","tb_cases")
+tb_data$population <- round(tb_data$population/1e+6,2)
+tb_data$incidence <- round((tb_data$tb_cases*0.1)/tb_data$population,1)
+all_countries = unique(tb_data$Country)
+all_countries <- data.frame(Country=all_countries)
+head(all_countries)
+```
+
+## Load the Country and ISO Codes
+```{r}
+world <- fread("https://raw.githubusercontent.com/damonzon/WHO_TB_Burden/master/world2.csv")
+names(world)
+names(world) <- c("Country", "alpha_2","alpha_3",
+    "sub_region","intermediate_region","region_code")
+names(world)
+class(world$Country)
+```
+\pagebreak
+
+## Harmonize country names tetween the 2 datasets
+```{r}
+world$Country[28] <- "Bonaire, Saint Eustatius and Saba"
+world$Country[52] <- "Democratic Republic of the Congo" 
+world$Country[71] <- "Swaziland" # Eswatini
+world$Country[119] <- "Democratic People's Republic of Korea"
+world$Country[120] <- "Republic of Korea"
+world$Country[133] <- "The Former Yugoslav Republic of Macedonia"
+world$Country[147] <- "Republic of Moldova"
+world$Country[171] <- "West Bank and Gaza Strip"
+world$Country[220] <- "United Republic of Tanzania"
+world$Country[243] <- "British Virgin Islands"
+world$Country[245] <- "Wallis and Futuna Islands"
+world <- arrange(world,Country)
+```
+
+## Merge the datasets
+```{r}
+class(all_countries$Country)
+all_countries$Country <- as.character(all_countries$Country)
+class(all_countries$Country) 
+data <- left_join(all_countries,world, by = "Country")
+regions <- merge(tb_data,data, by = "Country")
+names(regions)
+regions$region_code <- ifelse(regions$region_code=="",
+      regions$intermediate_region,regions$region_code)
+regions$intermediate_region <-NULL
+names(regions)
+# write.csv(regions,"tb_regions.csv",row.names=FALSE)
+```
+
+
+
