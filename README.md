@@ -28,7 +28,7 @@ shiny::runGitHub("WHO_TB_Burden", "damonzon")
 
 https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv
 
-
+4. Wrangling_Life_Exp.Rmd shapes and joins World Bank Life Expectancy at Birth data to dthe TB Incidence data.
 
 
 
