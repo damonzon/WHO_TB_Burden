@@ -1,0 +1,68 @@
+---
+title: "Data Wrangling for Life Expectancy"
+author: "Patrick Kelly"
+date: "2/14/2019"
+output: pdf_document
+---
+
+# Life Expectancy at Birth: World Bank Data
+## Add this to the TB Incidence data
+
+[Click Here](https://data.worldbank.org/indicator/SP.DYN.LE00.IN)"Life Exspectancy"
+
+```{r}
+suppressMessages(library(data.table))
+suppressMessages(library(dplyr))
+```
+## Load data for years 2000-2016
+```{r}
+data <- fread("Life_Exp.csv", skip = 4,
+        select=c(1,2,45:61),header = FALSE)
+data<- data[2:265,]
+colnames(data) <- c("Country","alpha_3","2000","2001",
+  "2002","2003","2004","2005","2006","2007",
+  "2008","2009","2010","2011","2012","2013",
+  "2014","2015","2016")
+cc<- complete.cases(data)
+data <- data[cc]
+data = melt(data, 
+      measure.vars = c("2000", "2001", "2002",
+      "2003","2004","2005","2006","2007","2008",
+      "2009","2010","2011","2012","2013","2014",
+      "2015","2016"),
+      variable.name = "year", value.name = "Life_Exp")     
+data <- arrange(data,Country)        
+data$Life_Exp <- round(data$Life_Exp,1)
+rm(cc)
+```
+# Load the TB Incidence data
+
+```{r}
+tb_regions <- fread("tb_regions.csv")
+all_tb <- data.frame(alpha_3=unique(tb_regions$alpha_3))
+all_tb$alpha_3 <- as.character(all_tb$alpha_3)
+all_tb <- all_tb[-c(44), ] 
+all_tb <- data.frame(alpha_3=all_tb)
+all_tb$alpha_3 <- as.character(all_tb$alpha_3)
+```
+
+```{r}
+data2 <- left_join(all_tb,data, by = "alpha_3")
+data2 <- data2[complete.cases(data2), ]
+data2 <- select(data2,year,alpha_3,Life_Exp)
+class(data2$year)
+data2$year <- as.numeric(as.character(data2$year))
+tb_Life_exp <- left_join(data2,tb_regions, by = c("alpha_3","year"))
+```
+
+```{r}
+tb_Life_exp  <- tb_Life_exp[complete.cases(tb_Life_exp), ]
+anyNA(tb_Life_exp)
+tb_Life_exp <- select(tb_Life_exp,Country,alpha_3,alpha_2,year,
+    population,incidence,Life_Exp,sub_region,region_code)
+dim(tb_Life_exp)
+head(tb_Life_exp)
+tail(tb_Life_exp)
+# write.csv(tb_Life_exp,"tb_Life_exp.csv", row.names = FALSE)
+```
+
